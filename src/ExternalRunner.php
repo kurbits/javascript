@@ -63,10 +63,10 @@ abstract class ExternalRunner implements Runner
     /**
      * Executes a string of JavaScript and returns the result if available.
      *
-     * @param $source
+     * @param string $source
      * @return mixed
      */
-    public function execute($source)
+    public function execute($source = '')
     {
         $source = $this->encode($source);
 
@@ -105,8 +105,8 @@ abstract class ExternalRunner implements Runner
         $runner = file_get_contents(__DIR__ . '/support/node_runner.js');
 
         if (!empty($this->sources)) {
-            $sources = implode("\n", $this->sources);
-            $source = "{$sources}\n{$source}";
+            $sources = implode("\n;", $this->sources);
+            $source = "{$sources};\n{$source}";
         }
 
         $source = str_replace('//--SOURCE--//', $source, $runner);
@@ -193,6 +193,9 @@ abstract class ExternalRunner implements Runner
      */
     protected function prepareSource($source)
     {
+        if (empty($source)) {
+            return '';
+        }
         $source = utf8_encode($source);
         $source = json_encode("({$source})");
         $source = "return eval({$source})";
